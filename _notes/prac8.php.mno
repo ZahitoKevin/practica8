@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_consulta_usuarios" value="name:id_usuario;datatype:int,name:nombre_usuario;datatype:string,name:apellido_usuario;datatype:string,name:folio;datatype:string" />
+</info>
