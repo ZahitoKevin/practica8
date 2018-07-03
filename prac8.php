@@ -31,6 +31,8 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+$currentPage = $_SERVER["PHP_SELF"];
+
 $maxRows_consulta_usuarios = 10;
 $pageNum_consulta_usuarios = 0;
 if (isset($_GET['pageNum_consulta_usuarios'])) {
@@ -51,6 +53,22 @@ if (isset($_GET['totalRows_consulta_usuarios'])) {
   $totalRows_consulta_usuarios = mysql_num_rows($all_consulta_usuarios);
 }
 $totalPages_consulta_usuarios = ceil($totalRows_consulta_usuarios/$maxRows_consulta_usuarios)-1;
+
+$queryString_consulta_usuarios = "";
+if (!empty($_SERVER['QUERY_STRING'])) {
+  $params = explode("&", $_SERVER['QUERY_STRING']);
+  $newParams = array();
+  foreach ($params as $param) {
+    if (stristr($param, "pageNum_consulta_usuarios") == false && 
+        stristr($param, "totalRows_consulta_usuarios") == false) {
+      array_push($newParams, $param);
+    }
+  }
+  if (count($newParams) != 0) {
+    $queryString_consulta_usuarios = "&" . htmlentities(implode("&", $newParams));
+  }
+}
+$queryString_consulta_usuarios = sprintf("&totalRows_consulta_usuarios=%d%s", $totalRows_consulta_usuarios, $queryString_consulta_usuarios);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -76,6 +94,25 @@ $totalPages_consulta_usuarios = ceil($totalRows_consulta_usuarios/$maxRows_consu
     </tr>
     <?php } while ($row_consulta_usuarios = mysql_fetch_assoc($consulta_usuarios)); ?>
 </table>
+<p><a href="/p8/insertar.php">insert </a></p>
+<p>&nbsp;
+<table border="0">
+  <tr>
+    <td><?php if ($pageNum_consulta_usuarios > 0) { // Show if not first page ?>
+        <a href="<?php printf("%s?pageNum_consulta_usuarios=%d%s", $currentPage, 0, $queryString_consulta_usuarios); ?>">First</a>
+        <?php } // Show if not first page ?></td>
+    <td><?php if ($pageNum_consulta_usuarios > 0) { // Show if not first page ?>
+        <a href="<?php printf("%s?pageNum_consulta_usuarios=%d%s", $currentPage, max(0, $pageNum_consulta_usuarios - 1), $queryString_consulta_usuarios); ?>">Previous</a>
+        <?php } // Show if not first page ?></td>
+    <td><?php if ($pageNum_consulta_usuarios < $totalPages_consulta_usuarios) { // Show if not last page ?>
+        <a href="<?php printf("%s?pageNum_consulta_usuarios=%d%s", $currentPage, min($totalPages_consulta_usuarios, $pageNum_consulta_usuarios + 1), $queryString_consulta_usuarios); ?>">Next</a>
+        <?php } // Show if not last page ?></td>
+    <td><?php if ($pageNum_consulta_usuarios < $totalPages_consulta_usuarios) { // Show if not last page ?>
+        <a href="<?php printf("%s?pageNum_consulta_usuarios=%d%s", $currentPage, $totalPages_consulta_usuarios, $queryString_consulta_usuarios); ?>">Last</a>
+        <?php } // Show if not last page ?></td>
+  </tr>
+</table>
+</p>
 </body>
 </html>
 <?php
